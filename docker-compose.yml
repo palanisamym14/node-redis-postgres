@@ -1,0 +1,45 @@
+version: "3"
+services:
+  redis:
+    image: sameersbn/redis:4.0.9-3
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./pgdata:/var/lib/redis
+    restart: always
+  db:
+    image: postgres
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks: 
+      - webnet
+    environment:
+      POSTGRES_DB: redis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+  web:
+    image: node-redis-server
+    depends_on:
+      - db
+    environment:
+      - SLEEP_LENGTH: 2.5
+    ports:
+      - "4000:4000"
+    networks:
+      - webnet
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+    # command: ["./wait-for-it.sh", "db:5432", "--", "node", "dist/index.js"]
+    command: ["node", "dist/index.js"]
+networks:
+  webnet:
+    driver: bridge
+volumes:
+  pgdata:
+  redisdata:
+  cachedata:
+  mediadata:
+  mongodata:
