@@ -1,6 +1,10 @@
 import redis from "../redis";
 const stopStrArr = ["STOP", "STOP\n", "STOP\r", "STOP\r\n"];
+const expiryDuration = 14400;
+import _res from "./../_helpers/response.helper";
+import { SMSContants } from "./../_helpers/sms.constant";
 import DataBaseConnection from "./../db";
+
 export class InBoundService {
   private redis: any;
   private sequlize = DataBaseConnection.sequelize;
@@ -9,24 +13,31 @@ export class InBoundService {
   }
   public getInBoundService = async (req, res) => {
     try {
-      const result  = await this.sequlize.query("SELECT * FROM `users`")
-      return this.redis.get(`wikipedia:palani`, (err, result) => {
-        if (result) {
-          const resultJSON = JSON.parse(result);
-          return res.status(200).json(resultJSON);
+      const reqBody = req.body;
+      if (!reqBody) {
+        return _res.statusOk(req, res, SMSContants.EMPTY_REQUEST);
+      }
+      const result = await this.sequlize.query(
+        `SELECT * FROM phone_number where number = '${reqBody.from}'`
+      );
+      if (!result[0].length) {
+        return _res.statusOk(req, res, SMSContants.FROM_NOT_FOUND);
+      }
+      const key = reqBody.from;
+      this.redis.get(key, (err, smscount) => {
+        const count = Number(smscount);
+        if (!!count) {
+          this.redis.setex(key, 1);
+          this.redis.setex(key, expiryDuration);
+        } else if (smscount <= 50) {
+          this.redis.setex(key, 1);
         } else {
-          this.redis.setex(
-            `wikipedia:palani`,
-            3600,
-            JSON.stringify({ source: "Redis Cache", data: "ddsdsdsdsdsds" })
-          );
-          return res
-            .status(200)
-            .json({ source: "Wikipedia API", data: "ddsdsdsdsdsds" });
+          return _res.statusOk(req, res, `${key} ${SMSContants.LIMIT_EXCEED}`);
         }
+        return _res.statusOk(req, res, SMSContants.OUTBOUND_SMS_OK);
       });
     } catch (err) {
-      throw err;
+      return _res.statusError(res, err);
     }
-  };
+  }
 }

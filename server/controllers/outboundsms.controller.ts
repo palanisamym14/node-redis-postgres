@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import _res from "./../_helpers/response.helper";
 import { OutBoundService } from "./../service/outbound.service";
 // tslint:disable-next-line:ordered-imports
 import {
@@ -22,11 +23,10 @@ export class OutBoundSMSController {
 
   public outBoundSMS = async ( request: Request, response: Response, next ) => {
     try {
-      const data = await schemaValidator(request.body, outboundschema);
+      // const data = await schemaValidator(request.body, outboundschema);
       return new OutBoundService().getOutBoundService(request, response);
     } catch (error) {
-      response.status(500).json(constructError(error));
+      return _res.statusError(response, constructError(error));
     }
   }
 }
-

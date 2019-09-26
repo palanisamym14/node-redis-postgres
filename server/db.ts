@@ -16,9 +16,18 @@ class DataBaseConnection {
       DB.PASSWORD,
       {
         dialect: "postgres",
+        host: "localhost",
         logging: true
       }
     );
+    this.sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
     return true;
   }
 

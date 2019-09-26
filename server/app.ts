@@ -3,7 +3,6 @@ import express from "express";
 import path from "path";
 // tslint:disable-next-line:max-line-length
 import {
-  HttpClientController,
   InBoundSMSController,
   OutBoundSMSController
 } from "./controllers/index";
@@ -58,7 +57,6 @@ class App {
    * API main routes
    */
   private initializeControllers(controllers) {
-    this.express.use("/", new HttpClientController().router);
     controllers.forEach((controller) => {
       this.express.use("/", controller.router);
     });

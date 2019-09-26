@@ -13,3 +13,4 @@ build/
 *.sln
 package-lock.json
 yarn.lock*
+pgdata

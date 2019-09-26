@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import _res from "./../_helpers/response.helper";
 import { constructError, outboundschema,
   schemaValidator } from "./../_helpers/joivalidation";
 import * as auth from "./../middleware/authToken";
@@ -14,16 +15,15 @@ export class InBoundSMSController {
   }
 
   public intializeRoutes() {
-    this.router.post(`${this.path}/sms`, this.inBoundSMS);
+    this.router.post(`${this.path}/sms`, auth.validateToken, this.inBoundSMS);
   }
 
   public inBoundSMS = async ( request: Request, response: Response, next ) => {
-    console.log(request)
     try {
       // const data = await schemaValidator(request.body, outboundschema);
       return new InBoundService().getInBoundService(request, response);
     } catch (error) {
-      return response.status(500).json(constructError(error));
+      return _res.statusError(response, constructError(error));
     }
   }
 }

@@ -1,26 +1,28 @@
+import _res from "./../_helpers/response.helper";
+import { SMSContants } from "./../_helpers/sms.constant";
+import DataBaseConnection from "./../db";
 import redis from "./../redis";
-const stopStrArr = ["STOP", "STOP\n", "STOP\r", "STOP\r\n"];
 export class OutBoundService {
-    private redis: any;
-  constructor() {
+  private redis: any;
+  private sequlize = DataBaseConnection.sequelize;
 
+  constructor() {
     this.redis = redis.get();
   }
-  public getOutBoundService = (req, res) => {
-    return this.redis.get(`wikipedia:palani`, (err, result) => {
-        if (result) {
-          const resultJSON = JSON.parse(result);
-          return res.status(200).json(resultJSON);
-        } else {
-          this.redis.setex(
-            `wikipedia:palani`,
-            3600,
-            JSON.stringify({ source: "Redis Cache", data: "ddsdsdsdsdsds" })
-          );
-          return res
-            .status(200)
-            .json({ source: "Wikipedia API", data: "ddsdsdsdsdsds" });
-        }
-      });
-  };
+  public getOutBoundService = async (req, res) => {
+    try {
+      const reqBody = req.body;
+      if (!reqBody) {
+        return _res.statusOk(req, res, SMSContants.EMPTY_REQUEST);
+      }
+      const result = await this.sequlize.query(`SELECT * FROM phone_number where number = '${reqBody.from}'`);
+      if (!result[0].length) {
+        return _res.statusOk(req, res, SMSContants.FROM_NOT_FOUND);
+      }
+      const key = reqBody.from + reqBody.to;
+      return _res.statusOk(req, res, SMSContants.INBOUND_SMS_OK);
+    } catch (err) {
+      return _res.statusError(res, err);
+    }
+  }
 }

@@ -1,11 +1,19 @@
 class ResponseHelper {
-    public statusOk = (req: any, res: any, data: any) => {
-        this.jsonResponse(res, data);
+    public statusOk = (req: any, res: any, data: any,status = 200) => {
+        this.jsonResponse(res, data, status);
     }
-    public jsonResponse(res: any, body: { responseBody: any; }) {
-        const options = Object(body) || {};
-        options.status = options.status || 200;
-        res.status(options.status).json(body.responseBody || null);
+    public jsonResponse(res: any, body: any, status) {
+        status = status || 200;
+        let resBody;
+        if (status === 200) {
+            resBody = {message: body, error: ""};
+        } else {
+            resBody = {message: "", error: body};
+        }
+        res.status(status).json(resBody || null);
+    }
+    public statusError = (res: any, data: any, status = 500) => {
+        this.jsonResponse(res, data, status);
     }
 }
 

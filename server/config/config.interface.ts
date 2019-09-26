@@ -1,6 +1,5 @@
 export interface InterfaceConfig {
     Database: InterfaceDatabase;
-    // Cloudinary: InterfaceCloudinary;
     Port: number;
 }
 
