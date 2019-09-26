@@ -1,7 +1,7 @@
-import * as joi from "joi";
-
-export const outboundschema = joi.object({
-  from: joi.number()
+import joi from "@hapi/joi";
+export class SMSschema {
+  public outboundschema = joi.object({
+    from: joi.number()
     .integer()
     .min(6)
     .max(16),
@@ -15,18 +15,18 @@ export const outboundschema = joi.object({
     .min(6)
     .max(16)
     .required()
-});
-export const schemaValidator = (input, reqSchema) => {
-  return joi.validate(input, reqSchema);
-};
+    });
 
-export const constructError = (err) => {
-  const errorResp = {
-    error: "",
-    message: ""
+  public schemaValidator = (input, reqSchema) => {
+    try {
+      const valid = reqSchema.validate(input);
+      if (valid["error"] && Object.keys(valid["error"]).length > 0) {
+        console.log(valid)
+        throw valid;
+      }
+      return true;
+    } catch (error) {
+      throw error;
+    }
   };
-  if (err && err.details && Array.isArray(err.details)) {
-    return errorResp.error = err.details.map((e) => e.context.key).join(",").concat(" is missing");
-  }
-  return errorResp.error = err;
-};
+}
