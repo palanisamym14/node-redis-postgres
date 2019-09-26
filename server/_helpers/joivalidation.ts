@@ -21,7 +21,6 @@ export class SMSschema {
     try {
       const valid = reqSchema.validate(input);
       if (valid["error"] && Object.keys(valid["error"]).length > 0) {
-        console.log(valid)
         throw valid;
       }
       return true;
