@@ -1,0 +1,10 @@
+---
+- hosts: remote
+  user: ubuntu
+
+  vars_files:
+    - vars/all.yml
+
+  tasks:
+    - include: tasks/deploy.yml
+
