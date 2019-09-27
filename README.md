@@ -59,7 +59,7 @@
      ```sh
       ansible-playbook provisioning/site.yml -i provisioning/hosts.yml
      ```
-  * Deploy the application in remote
+ * Deploy the application in remote
   
     ```sh 
      ansible-playbook  -i  ci/prod.ymlci/host.yml
