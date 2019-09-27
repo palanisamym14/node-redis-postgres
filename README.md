@@ -46,3 +46,21 @@
     docker-compose kill
     docker-compose rm -f
     ```
+* provisioning Remote server (install Docker)
+     check remote server is avaliable
+     ```sh 
+     ssh ubuntu@192.168.99.30
+     ```
+     check ansible Avaliable
+     ```sh
+     ansible --version
+     ```
+     provisioning install docker and docker compose
+     ```sh
+      ansible-playbook provisioning/site.yml -i provisioning/hosts.yml
+     ```
+  * Deploy the application in remote
+  
+    ```sh 
+     ansible-playbook  -i  ci/prod.ymlci/host.yml
+     ```
