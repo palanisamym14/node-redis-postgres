@@ -62,5 +62,5 @@
  * Deploy the application in remote
   
     ```sh 
-     ansible-playbook  -i  ci/prod.ymlci/host.yml
+     ansible-playbook  -i  ci/prod.yml ci/host.yml
      ```
