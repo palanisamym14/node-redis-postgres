@@ -1,0 +1,4 @@
+---
+app_name: node_redis_postgres
+sub_dir: prod
+

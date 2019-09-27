@@ -1,0 +1,31 @@
+---
+
+- name: create base directory
+  file: path=app/{{ app_name }} state=directory
+
+- name: create output directory
+  file: path=app/{{ app_name }}/{{sub_dir}} state=directory
+
+- name: Delete the old files
+  file: path=app/{{ app_name }}/{{sub_dir}}/{{ app_name }}.zip  state=absent
+
+- name: copy the files
+  copy: src=../build/{{ app_name }}.zip dest=app/{{ app_name }}/{{sub_dir}}/
+
+- name: remove | delete the old directory 
+  shell: /bin/rm -rf ~/app/{{ app_name }}/{{sub_dir}}
+
+  #synchronize: src=../build/amazon_s3_utility.zip dest=app/amazon_s3_utility/
+
+- name: unzip the file
+  unarchive: src=app/{{ app_name }}/{{sub_dir}}/{{ app_name }}.zip dest=app/{{ app_name }}/{{sub_dir}} remote_src=true
+
+- name: move to remote working directory
+  command: chdir=/opt/{{app_name}}/{{sub_dir}}
+
+- name: Docker build app image
+  command: docker build -t node-redis-server .
+
+- name: Docker compose start the docker image
+  command: docker-compose up
+
